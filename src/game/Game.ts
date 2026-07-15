@@ -137,6 +137,7 @@ export class Game {
    */
   private applyOwnedItemEffects(): void {
     this.playerGlove.setReachMultiplier(Store.ownsItem("long-spring") ? 2 : 1);
+    this.playerGlove.setSpeedMultiplier(Store.ownsItem("coffee") ? 2 : 1);
   }
 
   /** Refreshes the HUD's money readout from the Store — call after any change to money. */
