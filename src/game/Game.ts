@@ -126,6 +126,17 @@ export class Game {
     this.opponentDunceCap = createDunceCap(this.scene, "opponentDunceCap", this.opponent.radius);
 
     this.updateMoneyDisplay();
+    this.applyOwnedItemEffects();
+  }
+
+  /**
+   * Re-applies every owned item's effect to the player's already-built
+   * glove/marble — called once on scene build and again after every
+   * purchase, since the glove is never rebuilt by resetRound. Never touches
+   * opponentGlove/opponent.
+   */
+  private applyOwnedItemEffects(): void {
+    this.playerGlove.setReachMultiplier(Store.ownsItem("long-spring") ? 2 : 1);
   }
 
   /** Refreshes the HUD's money readout from the Store — call after any change to money. */
@@ -136,6 +147,7 @@ export class Game {
   /** Fired by EndGameOverlay after every successful win-dialog purchase. */
   private onItemPurchased(): void {
     this.updateMoneyDisplay();
+    this.applyOwnedItemEffects();
   }
 
   /** Left-click throws a punch toward wherever the pointer is on the arena plane. */
