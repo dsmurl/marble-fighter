@@ -2,17 +2,17 @@
 
 # Item Store Mechanism (Money, Persistence, Purchasable Upgrades)
 
-**Status: proposed / not yet implemented.** This doc is written ahead of code per the
-[Mechanisms](../README.md) convention — new mechanisms get designed and checked for compatibility
-against existing ones before or alongside implementation, not documented after the fact. Treat the
-"Mental model" section below as the target design an implementation should be checked against, and
-update it if the implementation ends up deviating.
+**Status: implemented.** Originally written ahead of code per the [Mechanisms](../README.md)
+convention — new mechanisms get designed and checked for compatibility against existing ones before
+or alongside implementation, not documented after the fact. The "Mental model" section below is kept
+in sync with the shipped implementation; check new work against it.
 
-Will span a new `Store.ts` (localStorage-backed money/inventory state), changes to
+Spans [`Store.ts`](../../../src/game/Store.ts) (localStorage-backed money/inventory state), changes to
 [`Game.ts`](../../../src/game/Game.ts) (awarding money on a landed player punch, applying owned-item
 effects to the player's [`Marble`](../../../src/game/Marble.ts)/[`Glove`](../../../src/game/Glove.ts)),
 [`EndGameOverlay.ts`](../../../src/game/EndGameOverlay.ts) (rendering the store inside the win dialog),
-and `index.html` (HUD money readout, top-right reset button, store markup/styles).
+[`Headwear.ts`](../../../src/game/Headwear.ts) (the halo cosmetic), and `index.html` (HUD money
+readout, top-right reset button, store markup/styles).
 
 ## What it is
 
@@ -92,28 +92,37 @@ or any of the three items should be checked against these points.
 5. **Item effects are applied by *parameterizing* the existing mechanisms, not branching them.**
    `Glove` already derives `reach` from `ballRadius` in its constructor and hardcodes
    `EXTEND_DURATION_MS`/`RETRACT_DURATION_MS` as module constants. Long Spring and Coffee become
-   multipliers passed into `Glove`'s constructor (read from the store when `Game.buildScene`/
-   `resetRound` constructs or reconfigures the player's glove), not an `if (ownsLongSpring)` branch
-   scattered through `Glove.update`. This mirrors how `control-mechanism.md` treats new
-   movement-adjacent features — extend the existing vocabulary (`reach`, duration constants)
-   instead of forking the code path.
+   `reachMultiplier`/`speedMultiplier` (both default 1) applied on top of that existing math, set at
+   runtime via `Glove.setReachMultiplier(m)`/`setSpeedMultiplier(m)` — **not** constructor
+   parameters as originally sketched, because the glove is built once in `Game.buildScene` and
+   `resetRound` never reconstructs it, so a purchase mid-session has no later constructor call to
+   feed. `Game.applyOwnedItemEffects()` calls both setters against `Store.ownsItem(...)` on scene
+   build and again after every purchase (via `EndGameOverlay`'s `onPurchase` callback). Never an
+   `if (ownsLongSpring)` branch scattered through `Glove.update` — this still mirrors how
+   `control-mechanism.md` treats new movement-adjacent features, just via setters instead of
+   constructor args.
 
 6. **Halo's hover only triggers at the jump's apex, not for the whole time airborne — it's a hang,
    not a flight.** The apex is the instant the marble's vertical velocity crosses from rising
-   (`vy > 0`) to falling (`vy <= 0`). If `Space` is held (`input.isDown`, not edge-triggered like
-   the initial jump — see control-mechanism.md point 4, which this deliberately does *not* reuse,
-   since hover is a hold-to-sustain effect) at/through that instant **and** the player owns the
-   halo item, the marble's vertical velocity is pinned to zero and its effective gravity is zeroed
-   for as long as `Space` stays held — it hangs motionless in midair at that exact height. Releasing
-   `Space` (or never holding it at the apex) immediately restores normal gravity and the marble
-   resumes falling from wherever it is. Per
+   (`vy > 0`) to falling (`vy <= 0`), read via a new `Marble.getVerticalVelocity()` accessor
+   (`body.body.getLinearVelocity().y`) rather than `Game.ts` reaching into `body.body` directly. If
+   `Space` is held (`input.isDown`, not edge-triggered like the initial jump — see
+   control-mechanism.md point 4, which this deliberately does *not* reuse, since hover is a
+   hold-to-sustain effect) at/through that instant **and** the player owns the halo item, the
+   marble's vertical velocity is pinned to zero (`Marble.setVerticalVelocity(0)`) and its effective
+   gravity is zeroed (`Marble.setGravityFactor(0)`, which wraps Havok's
+   `PhysicsBody.setGravityFactor` — the guess made while this doc was still a proposal turned out to
+   match the shipped API exactly) for as long as `Space` stays held — it hangs motionless in midair
+   at that exact height. `Game.updateHaloHover()` tracks the apex crossing and the active hover flag;
+   releasing `Space` (or never holding it at the apex) calls `setGravityFactor(1)` and the marble
+   immediately resumes falling from wherever it is. `Marble.reset()` also forces gravity back to 1,
+   so a round boundary can never strand the player mid-hover. Per
    [control-mechanism.md point 3](./control-mechanism.md) ("movement is a force, not a teleport"),
-   this should still be expressed as a physics-body property (a per-frame gravity cancel while held,
-   e.g. a gravity-factor toggle or a per-frame counter-force) rather than a raw `mesh.position`
-   freeze, so collisions and the eventual fall still fall out of Havok once released. Deliberately
-   scoped this narrow — a full "hold Space anywhere in the air to float" ability would let the
-   player camp indefinitely above the arena, which conflicts with the ring-out win condition
-   (`checkRingOut`, `y < -6`) reading as a race to the bottom, not a stalling contest.
+   this is expressed as a physics-body property rather than a raw `mesh.position` freeze, so
+   collisions and the eventual fall still fall out of Havok once released. Deliberately scoped this
+   narrow — a full "hold Space anywhere in the air to float" ability would let the player camp
+   indefinitely above the arena, which conflicts with the ring-out win condition (`checkRingOut`,
+   `y < -6`) reading as a race to the bottom, not a stalling contest.
 
 ## Ideation and reasoning (for a human reading this cold)
 

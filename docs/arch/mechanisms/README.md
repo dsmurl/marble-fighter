@@ -26,7 +26,7 @@ movement, or combat.
 | Link | Description |
 | --- | --- |
 | [control-mechanism.md](control-mechanism.md) | Movement, jump, and punch: how keyboard/touch input drives the physics-based marbles, and the design decisions baked into that. |
-| [item-store-mechanism.md](item-store-mechanism.md) | Proposed: earning money by punching, localStorage-backed persistence, and a win-dialog store for permanent upgrades (longer spring, faster punch, hover halo). |
+| [item-store-mechanism.md](item-store-mechanism.md) | Earning money by punching, localStorage-backed persistence, and a win-dialog store for permanent upgrades (longer spring, faster punch, hover halo). |
 
 ## Subdirectories
 
