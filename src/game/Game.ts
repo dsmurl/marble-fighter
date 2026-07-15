@@ -23,6 +23,7 @@ import { EndGameOverlay } from "./EndGameOverlay";
 import { Glove } from "./Glove";
 import { createCrown, createDunceCap, updateHeadwearPosition } from "./Headwear";
 import { SoundEffects } from "./SoundEffects";
+import { TouchControls } from "./TouchControls";
 
 const ROLL_FORCE = 9;
 // Calibrated so the apex lands ~1.75x the ball's diameter above the ground
@@ -39,6 +40,7 @@ export class Game {
   private readonly scene: Scene;
   private readonly canvas: HTMLCanvasElement;
   private readonly input = new InputManager();
+  private readonly touchControls = new TouchControls(this.input);
   private readonly endGameOverlay = new EndGameOverlay(() => this.resetRound());
   private readonly sounds = new SoundEffects();
 
@@ -198,8 +200,14 @@ export class Game {
   }
 
   private handlePlayerInput(): void {
-    const forwardAxis = this.input.getAxis("KeyS", "KeyW") || this.input.getAxis("ArrowDown", "ArrowUp");
-    const rightAxis = this.input.getAxis("KeyA", "KeyD") || this.input.getAxis("ArrowLeft", "ArrowRight");
+    const forwardAxis =
+      this.input.getAxis("KeyS", "KeyW") ||
+      this.input.getAxis("ArrowDown", "ArrowUp") ||
+      this.touchControls.forwardAxis;
+    const rightAxis =
+      this.input.getAxis("KeyA", "KeyD") ||
+      this.input.getAxis("ArrowLeft", "ArrowRight") ||
+      this.touchControls.rightAxis;
 
     if (forwardAxis !== 0 || rightAxis !== 0) {
       // Move relative to camera yaw so "forward" always means "away from camera".
