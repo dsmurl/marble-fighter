@@ -12,7 +12,7 @@ interface ShopItem {
 const SHOP_ITEMS: ShopItem[] = [
   { id: "long-spring", name: "Long Spring", description: "Doubles the glove's reach.", price: 20 },
   { id: "coffee", name: "Coffee", description: "Doubles punch speed.", price: 20 },
-  { id: "halo", name: "Halo", description: "Hover at a jump's peak while holding Space.", price: 20 },
+  { id: "halo", name: "Halo", description: "Hover at a jump's peak while holding jump.", price: 20 },
 ];
 
 function requireElement<T extends HTMLElement>(id: string): T {
