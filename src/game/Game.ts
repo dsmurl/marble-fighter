@@ -24,6 +24,7 @@ import { Glove } from "./Glove";
 import { createCrown, createDunceCap, updateHeadwearPosition } from "./Headwear";
 import { SoundEffects } from "./SoundEffects";
 import { TouchControls } from "./TouchControls";
+import * as Store from "./Store";
 
 const ROLL_FORCE = 9;
 // Calibrated so the apex lands ~1.75x the ball's diameter above the ground
@@ -43,6 +44,7 @@ export class Game {
   private readonly touchControls = new TouchControls(this.input);
   private readonly endGameOverlay = new EndGameOverlay(() => this.resetRound());
   private readonly sounds = new SoundEffects();
+  private readonly moneyDisplay = document.getElementById("hud-money") as HTMLDivElement;
 
   private camera!: ArcRotateCamera;
   private arena!: Arena;
@@ -108,6 +110,13 @@ export class Game {
 
     this.playerCrown = createCrown(this.scene, "playerCrown", this.player.radius);
     this.opponentDunceCap = createDunceCap(this.scene, "opponentDunceCap", this.opponent.radius);
+
+    this.updateMoneyDisplay();
+  }
+
+  /** Refreshes the HUD's money readout from the Store — call after any change to money. */
+  private updateMoneyDisplay(): void {
+    this.moneyDisplay.textContent = `$${Store.getState().money}`;
   }
 
   /** Left-click throws a punch toward wherever the pointer is on the arena plane. */
