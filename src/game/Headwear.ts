@@ -93,12 +93,13 @@ export function createHalo(scene: Scene, name: string, ballRadius: number): Tran
   haloMat.emissiveColor = Color3.FromHexString("#ffe98a");
   haloMat.specularColor = new Color3(1, 1, 0.9);
 
+  // CreateTorus's ring already lies flat in the XZ plane (its axis runs along
+  // Y) — no rotation needed to keep it parallel to the ground, angel-halo style.
   const ring: Mesh = MeshBuilder.CreateTorus(
     `${name}Ring`,
     { diameter: ballRadius * 1.6, thickness: ballRadius * 0.14, tessellation: 24 },
     scene,
   );
-  ring.rotation.x = Math.PI / 2;
   ring.position.y = ballRadius * 0.9;
   ring.material = haloMat;
   ring.parent = root;
