@@ -124,12 +124,30 @@ export class Marble {
     return this.mesh.position;
   }
 
+  /** Vertical component of the current linear velocity — used to detect a jump's apex (rising to falling). */
+  getVerticalVelocity(): number {
+    return this.body.body.getLinearVelocity().y;
+  }
+
+  /** Overwrites just the vertical component of velocity, leaving horizontal motion untouched. */
+  setVerticalVelocity(vy: number): void {
+    const velocity = this.body.body.getLinearVelocity();
+    velocity.y = vy;
+    this.body.body.setLinearVelocity(velocity);
+  }
+
+  /** 0 cancels gravity entirely (used by the Halo item's hover); 1 is normal. */
+  setGravityFactor(factor: number): void {
+    this.body.body.setGravityFactor(factor);
+  }
+
   /** Teleports the marble back to a start position and zeroes out its motion. */
   reset(position: Vector3): void {
     this.mesh.position.copyFrom(position);
     this.mesh.rotationQuaternion = Quaternion.Identity();
     this.body.body.setLinearVelocity(Vector3.Zero());
     this.body.body.setAngularVelocity(Vector3.Zero());
+    this.body.body.setGravityFactor(1);
     this.grounded = false;
     this.lastGroundedAt = 0;
 

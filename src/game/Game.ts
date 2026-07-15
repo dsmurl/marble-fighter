@@ -62,6 +62,8 @@ export class Game {
   private playerHalo!: TransformNode;
 
   private roundOver = false;
+  private haloHoverActive = false;
+  private playerPrevVerticalVelocity = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -196,6 +198,7 @@ export class Game {
       this.updateHeadwear();
       if (!this.roundOver) {
         this.handlePlayerInput();
+        this.updateHaloHover();
         this.opponentAI.update(this.player.getPosition());
         this.checkRingOut();
         updateCameraTarget(this.camera, this.player.getPosition());
@@ -277,6 +280,35 @@ export class Game {
     }
   }
 
+  /**
+   * Halo item: hang motionless in midair for as long as Space stays held,
+   * but only if Space was already held at the exact instant the player's
+   * jump crosses its apex (vy > 0 -> vy <= 0) while airborne. Holding Space
+   * anywhere else in the arc — ascending, or well past the apex — does
+   * nothing, so this stays a hang, not general flight.
+   */
+  private updateHaloHover(): void {
+    const currentVy = this.player.getVerticalVelocity();
+    const airborne = !this.player.isGrounded();
+    const spaceHeld = this.input.isDown("Space");
+
+    if (!this.haloHoverActive) {
+      const crossedApex = this.playerPrevVerticalVelocity > 0 && currentVy <= 0;
+      if (crossedApex && airborne && spaceHeld && Store.ownsItem("halo")) {
+        this.haloHoverActive = true;
+        this.player.setGravityFactor(0);
+        this.player.setVerticalVelocity(0);
+      }
+    } else if (!spaceHeld) {
+      this.haloHoverActive = false;
+      this.player.setGravityFactor(1);
+    } else {
+      this.player.setVerticalVelocity(0);
+    }
+
+    this.playerPrevVerticalVelocity = currentVy;
+  }
+
   private checkRingOut(): void {
     const fellOff = (marble: Marble) => marble.getPosition().y < -6;
 
@@ -299,5 +331,7 @@ export class Game {
     this.player.reset(PLAYER_START_POSITION.clone());
     this.opponent.reset(OPPONENT_START_POSITION.clone());
     this.roundOver = false;
+    this.haloHoverActive = false;
+    this.playerPrevVerticalVelocity = 0;
   }
 }
