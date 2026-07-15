@@ -81,12 +81,16 @@ export class Game {
     window.addEventListener("resize", () => this.engine.resize());
   }
 
-  /** Only clears store money/items — must never touch round state (player/opponent position, roundOver). */
   private registerResetButton(): void {
     this.resetButton.addEventListener("click", () => {
       if (!confirm("Reset your money and items?")) return;
       Store.reset();
+      // Store.reset() only clears localStorage — the player's already-built
+      // glove/halo still carry whatever multipliers/visibility a purchase
+      // set, so they need to be explicitly re-synced back to "nothing owned".
+      this.applyOwnedItemEffects();
       this.updateMoneyDisplay();
+      this.resetRound();
     });
   }
 
