@@ -60,6 +60,19 @@ export class InputManager {
     this.justPressedKeys.add(code);
   }
 
+  /** Marks a virtual key held — e.g. an on-screen touch button — so isDown() reflects it like a real keydown. */
+  simulateKeyDown(code: string): void {
+    if (!this.heldKeys.has(code)) {
+      this.justPressedKeys.add(code);
+    }
+    this.heldKeys.add(code);
+  }
+
+  /** Releases a virtual key held via simulateKeyDown(). */
+  simulateKeyUp(code: string): void {
+    this.heldKeys.delete(code);
+  }
+
   /** Returns a -1..1 axis value for a pair of opposing keys. */
   getAxis(negativeCode: string, positiveCode: string): number {
     let value = 0;

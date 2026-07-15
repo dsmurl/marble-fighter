@@ -32,6 +32,7 @@ export class TouchControls {
   private joystickPointerId: number | null = null;
   private joystickCenterX = 0;
   private joystickCenterY = 0;
+  private jumpPointerId: number | null = null;
 
   forwardAxis = 0;
   rightAxis = 0;
@@ -50,9 +51,23 @@ export class TouchControls {
     window.addEventListener("pointerup", this.handleJoystickUp);
     window.addEventListener("pointercancel", this.handleJoystickUp);
 
+    // Held (not a one-shot press) so isDown("Space") stays true for as long
+    // as the finger stays down — items like Halo's apex-hover depend on
+    // Space being sustained, not just edge-triggered.
     this.jumpButton.addEventListener("pointerdown", (event) => {
       event.preventDefault();
-      input.simulateKeyPress("Space");
+      this.jumpPointerId = event.pointerId;
+      input.simulateKeyDown("Space");
+    });
+    window.addEventListener("pointerup", (event) => {
+      if (event.pointerId !== this.jumpPointerId) return;
+      this.jumpPointerId = null;
+      input.simulateKeyUp("Space");
+    });
+    window.addEventListener("pointercancel", (event) => {
+      if (event.pointerId !== this.jumpPointerId) return;
+      this.jumpPointerId = null;
+      input.simulateKeyUp("Space");
     });
   }
 
