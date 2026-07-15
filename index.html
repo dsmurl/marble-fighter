@@ -117,17 +117,78 @@
       #endgame-restart:active {
         transform: translateY(0);
       }
+      .control-hidden {
+        display: none;
+      }
+      .touch-control {
+        position: fixed;
+        z-index: 5;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #touch-joystick {
+        left: 24px;
+        bottom: 24px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 2px solid rgba(255, 255, 255, 0.25);
+      }
+      #touch-joystick-knob {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 52px;
+        height: 52px;
+        margin-left: -26px;
+        margin-top: -26px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%);
+      }
+      #touch-jump-button {
+        right: 24px;
+        bottom: 24px;
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        color: #fff;
+        font-family: system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.05em;
+      }
+      #touch-jump-button:active {
+        background: rgba(255, 255, 255, 0.3);
+      }
     </style>
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
     <div id="hud">
       <div><strong>Marble Fighter</strong></div>
-      <div>WASD / Arrows — roll</div>
-      <div>Space — jump</div>
-      <div>Left-click — punch toward cursor</div>
+      <div id="hud-controls-desktop">
+        <div>WASD / Arrows — roll</div>
+        <div>Space — jump</div>
+        <div>Left-click — punch toward cursor</div>
+      </div>
+      <div id="hud-controls-touch" class="control-hidden">
+        <div>Left thumb — roll</div>
+        <div>Bottom-right button — jump</div>
+        <div>Tap the arena — punch toward tap</div>
+      </div>
       <div>Knock the AI marble off the platform to win</div>
     </div>
+    <div id="touch-joystick" class="touch-control control-hidden">
+      <div id="touch-joystick-knob"></div>
+    </div>
+    <button id="touch-jump-button" class="touch-control control-hidden">JUMP</button>
     <div id="endgame-overlay" class="hidden">
       <div class="endgame-card" id="endgame-card">
         <div class="endgame-title" id="endgame-title">YOU WIN</div>

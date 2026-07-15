@@ -55,6 +55,11 @@ export class InputManager {
     this.justPressedKeys.clear();
   }
 
+  /** Injects a one-frame "just pressed" edge for a virtual key — e.g. an on-screen touch button. */
+  simulateKeyPress(code: string): void {
+    this.justPressedKeys.add(code);
+  }
+
   /** Returns a -1..1 axis value for a pair of opposing keys. */
   getAxis(negativeCode: string, positiveCode: string): number {
     let value = 0;
