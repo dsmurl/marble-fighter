@@ -42,7 +42,10 @@ export class Game {
   private readonly canvas: HTMLCanvasElement;
   private readonly input = new InputManager();
   private readonly touchControls = new TouchControls(this.input);
-  private readonly endGameOverlay = new EndGameOverlay(() => this.resetRound());
+  private readonly endGameOverlay = new EndGameOverlay(
+    () => this.resetRound(),
+    () => this.onItemPurchased(),
+  );
   private readonly sounds = new SoundEffects();
   private readonly moneyDisplay = document.getElementById("hud-money") as HTMLDivElement;
   private readonly resetButton = document.getElementById("hud-reset") as HTMLButtonElement;
@@ -128,6 +131,11 @@ export class Game {
   /** Refreshes the HUD's money readout from the Store — call after any change to money. */
   private updateMoneyDisplay(): void {
     this.moneyDisplay.textContent = `$${Store.getState().money}`;
+  }
+
+  /** Fired by EndGameOverlay after every successful win-dialog purchase. */
+  private onItemPurchased(): void {
+    this.updateMoneyDisplay();
   }
 
   /** Left-click throws a punch toward wherever the pointer is on the arena plane. */

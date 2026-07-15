@@ -32,8 +32,11 @@ export class EndGameOverlay {
   private readonly subtitle = requireElement<HTMLDivElement>("endgame-subtitle");
   private readonly store = requireElement<HTMLDivElement>("endgame-store");
   private readonly restartButton = requireElement<HTMLButtonElement>("endgame-restart");
+  /** Called after every successful purchase — e.g. to refresh the HUD and apply item effects. */
+  private readonly onPurchase: () => void;
 
-  constructor(onRestart: () => void) {
+  constructor(onRestart: () => void, onPurchase: () => void) {
+    this.onPurchase = onPurchase;
     this.restartButton.addEventListener("click", () => {
       // A focused <button> re-activates itself when Space is released, even
       // while hidden — CSS opacity/pointer-events don't affect keyboard
@@ -94,6 +97,14 @@ export class EndGameOverlay {
       } else {
         buyButton.textContent = `Buy $${item.price}`;
         buyButton.disabled = !affordable;
+        buyButton.addEventListener("click", () => {
+          if (!Store.buyItem(item.id, item.price)) return;
+          // A single visit can buy more than one item, so re-render in place
+          // rather than closing the dialog — the just-bought card darkens
+          // and the remaining two re-evaluate affordability immediately.
+          this.renderStore();
+          this.onPurchase();
+        });
       }
 
       cardEl.append(nameEl, descEl, buyButton);
