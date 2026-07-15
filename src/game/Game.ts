@@ -45,6 +45,7 @@ export class Game {
   private readonly endGameOverlay = new EndGameOverlay(() => this.resetRound());
   private readonly sounds = new SoundEffects();
   private readonly moneyDisplay = document.getElementById("hud-money") as HTMLDivElement;
+  private readonly resetButton = document.getElementById("hud-reset") as HTMLButtonElement;
 
   private camera!: ArcRotateCamera;
   private arena!: Arena;
@@ -69,8 +70,18 @@ export class Game {
     await this.initPhysics();
     this.buildScene();
     this.registerPunchInput();
+    this.registerResetButton();
     this.registerLoop();
     window.addEventListener("resize", () => this.engine.resize());
+  }
+
+  /** Only clears store money/items — must never touch round state (player/opponent position, roundOver). */
+  private registerResetButton(): void {
+    this.resetButton.addEventListener("click", () => {
+      if (!confirm("Reset your money and items?")) return;
+      Store.reset();
+      this.updateMoneyDisplay();
+    });
   }
 
   private async initPhysics(): Promise<void> {

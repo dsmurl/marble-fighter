@@ -117,6 +117,25 @@
       #endgame-restart:active {
         transform: translateY(0);
       }
+      #hud-reset {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        z-index: 5;
+        font-family: system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.12);
+        color: #eaeaea;
+        transition: background 0.15s ease;
+      }
+      #hud-reset:hover {
+        background: rgba(255, 255, 255, 0.22);
+      }
       .control-hidden {
         display: none;
       }
@@ -169,6 +188,7 @@
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
+    <button id="hud-reset">RESET</button>
     <div id="hud">
       <div><strong>Marble Fighter</strong></div>
       <div id="hud-money">$0</div>
