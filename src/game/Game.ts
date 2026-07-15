@@ -183,6 +183,8 @@ export class Game {
         this.playerGlove.update(deltaMs, this.player.getPosition(), this.opponent, (direction) => {
           this.opponent.applyPunchImpulse(direction, PUNCH_IMPULSE);
           this.sounds.playHit();
+          Store.addMoney(5);
+          this.updateMoneyDisplay();
         });
         this.opponentGlove.update(deltaMs, this.opponent.getPosition(), this.player, (direction) => {
           this.player.applyPunchImpulse(direction, PUNCH_IMPULSE);
