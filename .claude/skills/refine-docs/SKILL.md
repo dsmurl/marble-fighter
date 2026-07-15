@@ -129,7 +129,12 @@ back-links) — it should not add, remove, or rewrite individual mechanism files
    - Exception: `docs/README.md` — its parent is the repo root, so target `../README.md` (the root `README.md`)
      and text `[← Back to project root](../README.md)`.
 
-3. **ToC row order is deliberate, not alphabetical.** Within a Files or Subdirectories table, order rows so a
+3. **Non-documentation assets (images, diagrams, etc.) are siblings, not their own subdirectory, and never appear in a ToC.** An SVG/PNG/etc. that illustrates a specific doc lives directly next to that doc, in the same directory, referenced via a relative markdown image link (`![alt](name.svg)`). It is background material for the doc that embeds it, not a documentation entry in its own right, so:
+   - Never create an `images/` (or similarly-named) subdirectory to hold it.
+   - Never give it a row in any `README.md`'s Files or Subdirectories table.
+   - If you find an existing asset-only subdirectory (holding only images referenced by doc(s) in its parent), flatten it: move the asset files up to be siblings of the doc(s) that reference them, delete the now-empty subdirectory and its `README.md`, update the embedding doc(s)' image paths, and remove any stale ToC row that pointed at the subdirectory or the assets.
+
+4. **ToC row order is deliberate, not alphabetical.** Within a Files or Subdirectories table, order rows so a
    reader landing cold gets the right first impression:
    - An entry-point/"start here" doc (e.g. a launch/setup/getting-started guide) leads the table, even if its
      filename sorts later alphabetically.
@@ -153,10 +158,12 @@ back-links) — it should not add, remove, or rewrite individual mechanism files
    step 1 that's missing outright — it needs both the directory and its `README.md`).
 
 4. **For every `README.md`, check its Files and Subdirectories tables against reality:**
-   - Every non-README file in that directory should have exactly one row in Files. Flag extra rows (stale/deleted
-     files still linked) and missing rows (real files not listed).
-   - Every immediate subdirectory should have exactly one row in Subdirectories, linking to its `README.md`. Same
-     stale/missing check.
+   - Every non-README `.md` file in that directory should have exactly one row in Files. Flag extra rows
+     (stale/deleted files still linked) and missing rows (real files not listed). Non-`.md` sibling assets
+     (images, diagrams) are never listed — see rule 3.
+   - Every immediate subdirectory should have exactly one row in Subdirectories, linking to its `README.md`,
+     **except** an asset-only subdirectory, which per rule 3 shouldn't exist at all (flag it in step 7 instead).
+     Same stale/missing check for legitimate subdirectories.
    - Confirm the directory has a description above the tables (not just a bare title).
 
 5. **For every `.md` file, check the back-link rule.** The most reliable way is a small script rather than
@@ -189,11 +196,14 @@ back-links) — it should not add, remove, or rewrite individual mechanism files
    This also catches broken relative links anywhere in the file, not just the back-links — run it after every fix
    too, not just at the start.
 
-6. **Check ToC ordering** per rule 3 above — this one is judgment, not scriptable. Read each table and ask "would
+6. **Check ToC ordering** per rule 4 above — this one is judgment, not scriptable. Read each table and ask "would
    someone new to this directory be better served by a different order?"
 
 7. **Analyze whether existing docs are in the right place.** For each non-README file (and any subdirectory that
    isn't one of the baseline four), judge whether it currently sits in the best location:
+   - **First, check for asset-only subdirectories** (holding only images/diagrams referenced by doc(s) in the
+     parent directory, e.g. an `images/` folder) — these violate rule 3 outright regardless of naming and always
+     get flattened, no judgment call needed.
    - Does it clearly belong under one of the baseline directories (`arch/`, `setup/`, `how-to/`, `testing/`)
      instead of wherever it is now (e.g. an architecture doc sitting loose in `docs/` root, or a deploy guide
      living under `arch/` instead of `how-to/`)? Flag it to move.
@@ -216,7 +226,10 @@ back-links) — it should not add, remove, or rewrite individual mechanism files
      own back-link (it now points to a different parent), and any other doc's links that pointed at the old path.
    - Stale/missing ToC rows → add or remove rows to match reality.
    - Missing/wrong back-links → insert/correct per rule 2.
-   - Bad ordering → reorder rows per rule 3.
+   - Bad ordering → reorder rows per rule 4.
+   - Asset-only subdirectory (e.g. `images/` holding only referenced assets) → flatten per rule 3: move
+     the assets to be siblings of the doc(s) that reference them, delete the subdirectory and its
+     `README.md`, update the embedding doc(s)' image paths, and drop the stale ToC row.
 
 9. **Re-run the link/back-link script from step 5 after fixing** to confirm the fixes didn't introduce a new
    break, then report a short summary of what was changed.
@@ -255,3 +268,7 @@ Also sanity-check the two behaviors added for portability:
 - **Missing `docs/arch/mechanisms/`.** Temporarily rename it aside. Running this skill should flag it as missing
   in step 1 and, when fixing, recreate the directory with a scaffolded `README.md` whose description paragraph
   explains the mechanisms concept (per the [Mechanisms](#mechanisms) section), not a generic placeholder.
+- **Asset-only subdirectory.** Create an `images/` folder under some doc directory holding one `.svg`, with its
+  own `README.md` and a ToC row for it in the parent. Running this skill should flag it in step 7 and, when
+  fixing, move the `.svg` up to be a sibling of the referencing doc, delete `images/` and its `README.md`, fix
+  the doc's image path, and remove the stale Subdirectories row.

@@ -7,11 +7,11 @@ No editor, no IDE lock-in — everything is plain `.ts` files you (or an AI) can
 
 ```bash
 cd marble-fighter
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-Then open the printed `localhost` URL. `npm run build` produces a static `dist/` you can host anywhere.
+Then open the printed `localhost` URL. `pnpm build` produces a static `dist/` you can host anywhere.
 
 ## Controls
 

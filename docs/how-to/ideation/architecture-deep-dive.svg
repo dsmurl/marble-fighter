@@ -1,0 +1,64 @@
+<svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b5563"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="560" fill="#ffffff"/>
+
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="600" fill="#111827">Path 2 — Architecture Deep-Dive → AI-Assisted Docs</text>
+
+  <!-- 1: Architecture meeting -->
+  <rect x="300" y="56" width="300" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="82" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Architecture meeting</text>
+  <text x="450" y="101" text-anchor="middle" font-size="12.5" fill="#312e81">Led by the dev who knows the subject best</text>
+
+  <line x1="450" y1="120" x2="450" y2="152" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+  <!-- 2: Recorded and transcribed -->
+  <rect x="300" y="154" width="300" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="180" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Recorded &amp; AI-transcribed</text>
+  <text x="450" y="199" text-anchor="middle" font-size="12.5" fill="#312e81">AI transcription captures every detail said</text>
+
+  <line x1="450" y1="218" x2="450" y2="250" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+  <!-- 3: Fed to AI -->
+  <rect x="300" y="252" width="300" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="278" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Transcript fed to AI</text>
+  <text x="450" y="297" text-anchor="middle" font-size="12.5" fill="#312e81">AI reads the raw reasoning, not just a summary</text>
+
+  <line x1="450" y1="316" x2="450" y2="348" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+  <!-- 4: AI drafts doc -->
+  <rect x="270" y="350" width="360" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="376" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">AI drafts a mechanism / how-to doc</text>
+  <text x="450" y="395" text-anchor="middle" font-size="12.5" fill="#312e81">Written into docs/, then reviewed by the team</text>
+
+  <!-- fan out to 4 outcomes -->
+  <line x1="360" y1="414" x2="120" y2="452" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow2)"/>
+  <line x1="420" y1="414" x2="330" y2="452" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow2)"/>
+  <line x1="480" y1="414" x2="570" y2="452" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow2)"/>
+  <line x1="540" y1="414" x2="780" y2="452" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+  <!-- outcome boxes -->
+  <rect x="20" y="454" width="200" height="84" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+  <text x="120" y="478" text-anchor="middle" font-size="12.5" font-weight="600" fill="#065f46">Clarifies the "why"</text>
+  <text x="120" y="495" text-anchor="middle" font-size="11.5" fill="#065f46">for other devs who</text>
+  <text x="120" y="510" text-anchor="middle" font-size="11.5" fill="#065f46">weren't in the room</text>
+
+  <rect x="230" y="454" width="200" height="84" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+  <text x="330" y="478" text-anchor="middle" font-size="12.5" font-weight="600" fill="#065f46">Gives future AI</text>
+  <text x="330" y="495" text-anchor="middle" font-size="11.5" fill="#065f46">the mentality behind</text>
+  <text x="330" y="510" text-anchor="middle" font-size="11.5" fill="#065f46">the code, not just its shape</text>
+
+  <rect x="470" y="454" width="200" height="84" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+  <text x="570" y="478" text-anchor="middle" font-size="12.5" font-weight="600" fill="#065f46">Irons out future</text>
+  <text x="570" y="495" text-anchor="middle" font-size="11.5" fill="#065f46">concepts and follow-on</text>
+  <text x="570" y="510" text-anchor="middle" font-size="11.5" fill="#065f46">work before it's built</text>
+
+  <rect x="680" y="454" width="200" height="84" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+  <text x="780" y="478" text-anchor="middle" font-size="12.5" font-weight="600" fill="#065f46">Separates solid code</text>
+  <text x="780" y="495" text-anchor="middle" font-size="11.5" fill="#065f46">from temporary/needs-</text>
+  <text x="780" y="510" text-anchor="middle" font-size="11.5" fill="#065f46">polish maintenance work</text>
+</svg>
