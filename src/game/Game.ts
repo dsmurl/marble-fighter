@@ -20,6 +20,7 @@ import { InputManager } from "./InputManager";
 import { createCameraRig, updateCameraTarget } from "./CameraRig";
 import { AIController } from "./AIController";
 import { EndGameOverlay } from "./EndGameOverlay";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { Glove } from "./Glove";
 import { createCrown, createDunceCap, createHalo, updateHeadwearPosition } from "./Headwear";
 import { SoundEffects } from "./SoundEffects";
@@ -46,6 +47,7 @@ export class Game {
     () => this.resetRound(),
     () => this.onItemPurchased(),
   );
+  private readonly confirmDialog = new ConfirmDialog();
   private readonly sounds = new SoundEffects();
   private readonly moneyDisplay = document.getElementById("hud-money") as HTMLDivElement;
   private readonly resetButton = document.getElementById("hud-reset") as HTMLButtonElement;
@@ -82,8 +84,9 @@ export class Game {
   }
 
   private registerResetButton(): void {
-    this.resetButton.addEventListener("click", () => {
-      if (!confirm("Reset your money and items?")) return;
+    this.resetButton.addEventListener("click", async () => {
+      const confirmed = await this.confirmDialog.show("Reset your money and items?");
+      if (!confirmed) return;
       Store.reset();
       // Store.reset() only clears localStorage — the player's already-built
       // glove/halo still carry whatever multipliers/visibility a purchase

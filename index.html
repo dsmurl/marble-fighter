@@ -118,6 +118,80 @@
       #endgame-restart:active {
         transform: translateY(0);
       }
+      .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(4, 4, 8, 0.72);
+        backdrop-filter: blur(6px);
+        opacity: 1;
+        transition: opacity 0.2s ease;
+        z-index: 11;
+      }
+      .confirm-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .confirm-card {
+        min-width: 280px;
+        padding: 32px 40px;
+        border-radius: 16px;
+        text-align: center;
+        font-family: system-ui, sans-serif;
+        color: #f4f4f4;
+        background: linear-gradient(160deg, rgba(24, 24, 32, 0.95), rgba(10, 10, 16, 0.95));
+        border: 1px solid rgba(255, 90, 90, 0.5);
+        box-shadow: 0 0 40px rgba(255, 90, 90, 0.25), 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: endgame-pop 0.25s ease;
+      }
+      .confirm-title {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        margin-bottom: 8px;
+        color: #ff9a9a;
+        text-shadow: 0 0 20px rgba(255, 90, 90, 0.6);
+      }
+      .confirm-subtitle {
+        font-size: 14px;
+        color: #c8c8d0;
+        margin-bottom: 24px;
+      }
+      .confirm-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+      }
+      .confirm-btn {
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 28px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.1s ease, background 0.15s ease;
+      }
+      .confirm-btn:active {
+        transform: translateY(0);
+      }
+      .confirm-btn-cancel {
+        background: rgba(255, 255, 255, 0.12);
+        color: #eaeaea;
+      }
+      .confirm-btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.22);
+      }
+      .confirm-btn-danger {
+        background: #ff6f6f;
+        color: #101014;
+      }
+      .confirm-btn-danger:hover {
+        background: #ff8a8a;
+        transform: translateY(-1px);
+      }
       .endgame-store {
         display: flex;
         gap: 12px;
@@ -265,6 +339,16 @@
         <div class="endgame-subtitle" id="endgame-subtitle"></div>
         <div class="endgame-store hidden" id="endgame-store"></div>
         <button id="endgame-restart">OK</button>
+      </div>
+    </div>
+    <div id="confirm-overlay" class="confirm-overlay hidden">
+      <div class="confirm-card">
+        <div class="confirm-title">Reset Progress?</div>
+        <div class="confirm-subtitle" id="confirm-subtitle"></div>
+        <div class="confirm-actions">
+          <button id="confirm-cancel" class="confirm-btn confirm-btn-cancel">Cancel</button>
+          <button id="confirm-ok" class="confirm-btn confirm-btn-danger">Reset</button>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
