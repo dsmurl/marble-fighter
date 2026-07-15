@@ -8,14 +8,16 @@ lock-in — it's plain `.ts` files driven by Vite.
 
 ## Prerequisites
 
-- Node.js (with `npm`)
+- Node.js (with [`pnpm`](https://pnpm.io/)). If you use [asdf](https://asdf-vm.com/), running
+  `asdf install` from the repo root picks up the pinned Node and pnpm versions from
+  [`.tool-versions`](../../.tool-versions).
 
 ## Run it locally
 
 ```bash
 cd marble-fighter
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Then open the printed `localhost` URL. Vite hot-reloads as you edit files under `src/`.
@@ -23,11 +25,11 @@ Then open the printed `localhost` URL. Vite hot-reloads as you edit files under 
 ## Build for deployment
 
 ```bash
-npm run build
+pnpm build
 ```
 
 This runs `tsc` and then `vite build`, producing a static `dist/` directory you can host on any
-static file host. Use `npm run preview` to serve that build locally and check it before deploying.
+static file host. Use `pnpm preview` to serve that build locally and check it before deploying.
 
 ## Files
 

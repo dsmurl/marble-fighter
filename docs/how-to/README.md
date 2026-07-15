@@ -22,7 +22,9 @@ _None._
 
 ## Subdirectories
 
-_None._
+| Link | Description |
+| --- | --- |
+| [ideation/](ideation/README.md) | How the team uses conversations to ideate and refine work before it becomes Linear tickets. |
 
 ---
 

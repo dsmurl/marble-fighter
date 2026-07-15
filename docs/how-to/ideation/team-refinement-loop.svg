@@ -1,0 +1,68 @@
+<svg viewBox="0 0 900 680" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b5563"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="680" fill="#ffffff"/>
+
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="600" fill="#111827">Path 1 — Team-Driven Refinement Loop</text>
+
+  <!-- A: Meeting -->
+  <rect x="330" y="56" width="240" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="82" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Meeting</text>
+  <text x="450" y="101" text-anchor="middle" font-size="12.5" fill="#312e81">Team talks through the idea out loud</text>
+
+  <line x1="450" y1="120" x2="450" y2="152" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+  <!-- B: Linear project -->
+  <rect x="300" y="154" width="300" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="180" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Linear project created</text>
+  <text x="450" y="199" text-anchor="middle" font-size="12.5" fill="#312e81">The idea gets captured as a project doc</text>
+
+  <!-- split arrows -->
+  <line x1="380" y1="218" x2="190" y2="258" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+  <line x1="520" y1="218" x2="710" y2="258" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+  <!-- Async box -->
+  <rect x="40" y="260" width="300" height="72" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+  <text x="190" y="286" text-anchor="middle" font-size="14" font-weight="600" fill="#065f46">Async</text>
+  <text x="190" y="305" text-anchor="middle" font-size="12.5" fill="#065f46">Team comments on the project in Linear</text>
+  <text x="190" y="322" text-anchor="middle" font-size="12.5" fill="#065f46">over time, at their own pace</text>
+
+  <!-- Sync box -->
+  <rect x="560" y="260" width="300" height="72" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+  <text x="710" y="286" text-anchor="middle" font-size="14" font-weight="600" fill="#065f46">Sync</text>
+  <text x="710" y="305" text-anchor="middle" font-size="12.5" fill="#065f46">Team meets to read through and</text>
+  <text x="710" y="322" text-anchor="middle" font-size="12.5" fill="#065f46">refine the project together</text>
+
+  <!-- both feed down to decision -->
+  <line x1="190" y1="332" x2="380" y2="386" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+  <line x1="710" y1="332" x2="520" y2="386" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+  <!-- decision diamond -->
+  <polygon points="450,384 540,432 450,480 360,432" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+  <text x="450" y="428" text-anchor="middle" font-size="13" font-weight="600" fill="#7c2d12">Plan mostly</text>
+  <text x="450" y="445" text-anchor="middle" font-size="13" font-weight="600" fill="#7c2d12">stable?</text>
+
+  <!-- loop back: No -->
+  <path d="M360,432 L25,432 L25,186 L296,186" fill="none" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+  <text x="190" y="405" text-anchor="middle" font-size="12" fill="#4b5563">No — keep refining (async/sync)</text>
+
+  <!-- Yes down to C -->
+  <line x1="450" y1="480" x2="450" y2="512" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+  <text x="466" y="500" font-size="12" fill="#4b5563">Yes</text>
+
+  <!-- C: tickets -->
+  <rect x="300" y="514" width="300" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="540" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Broken out into Linear tickets</text>
+  <text x="450" y="559" text-anchor="middle" font-size="12.5" fill="#312e81">The stable plan is split into scoped work items</text>
+
+  <line x1="450" y1="578" x2="450" y2="610" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow1)"/>
+
+  <!-- D: implement -->
+  <rect x="270" y="612" width="360" height="64" rx="10" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="450" y="638" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Branch → implement → review</text>
+  <text x="450" y="657" text-anchor="middle" font-size="12.5" fill="#312e81">Includes updating docs on current assumptions/mechanisms</text>
+</svg>
