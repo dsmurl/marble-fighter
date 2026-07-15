@@ -11,8 +11,9 @@ Spans [`Store.ts`](../../../src/game/Store.ts) (localStorage-backed money/invent
 [`Game.ts`](../../../src/game/Game.ts) (awarding money on a landed player punch, applying owned-item
 effects to the player's [`Marble`](../../../src/game/Marble.ts)/[`Glove`](../../../src/game/Glove.ts)),
 [`EndGameOverlay.ts`](../../../src/game/EndGameOverlay.ts) (rendering the store inside the win dialog),
-[`Headwear.ts`](../../../src/game/Headwear.ts) (the halo cosmetic), and `index.html` (HUD money
-readout, top-right reset button, store markup/styles).
+[`Headwear.ts`](../../../src/game/Headwear.ts) (the halo cosmetic),
+[`ConfirmDialog.ts`](../../../src/game/ConfirmDialog.ts) (the styled reset confirmation), and
+`index.html` (HUD money readout, owned-items badge tray, top-right reset button, store markup/styles).
 
 ## What it is
 
@@ -30,12 +31,17 @@ landing punches on the opponent, and spends it between rounds on permanent upgra
   devtools. No backend, no schema migrations, no version field — this is deliberately the simplest
   thing that qualifies as persistence; see point 1.
 - **Display** — current money is always visible in the on-screen HUD (`#hud`), the same corner
-  that already shows controls text.
+  that already shows controls text, sized up and colored green so it reads at a glance. A separate
+  `#owned-items` tray, stacked vertically on the right edge above the jump button, shows a small
+  blue badge-icon per currently-owned item (a zigzag for Long Spring, a mug for Coffee, a tilted
+  ring for Halo) — a persistent "what do I have" readout that doesn't require opening the win
+  dialog to check.
 - **Reset** — a small gray button fixed to the top-right corner clears the stored money and owned
-  items back to defaults, behind a native `confirm()` prompt (one click of insurance against an
-  accidental misclick erasing progress — the "keep it simple" brief covers the storage mechanism,
-  not the UX guardrail around destroying it). It resets *only* this store data, nothing else about
-  the game.
+  items back to defaults, behind a `ConfirmDialog` prompt styled like the win/lose card (one click
+  of insurance against an accidental misclick erasing progress — the "keep it simple" brief covers
+  the storage mechanism, not the UX guardrail around destroying it). Nothing in the store's UI uses
+  a native browser `confirm()`/`alert()`. It resets *only* this store data, nothing else about the
+  game.
 - **Spending** — the store UI lives inside the existing win dialog (`EndGameOverlay`), shown only
   on the `"win"` outcome. It lists exactly three items, each a one-time permanent purchase: once
   bought, an item's card visibly darkens and can't be bought again (the player's money is the only
@@ -80,6 +86,10 @@ or any of the three items should be checked against these points.
    bought, applies for the rest of the browser session (until the reset button is pressed) — it is
    read from the store and applied to `this.player`'s `Marble`/`Glove`, never `this.opponent`'s.
    This keeps the AI's balance/tuning (`AIController.ts`) decoupled from player progression.
+   `Game.applyOwnedItemEffects()` is the single place this gets re-synced (scene build, after a
+   purchase, after a reset) — it drives the multipliers/halo visibility *and* the `#owned-items`
+   badge tray in the same pass, so there's one source of truth for "what does the player currently
+   have," not two paths that could drift out of sync.
 
 4. **The store UI only ever appears on a win, and only lists what's still unowned-or-affordable
    as active.** `EndGameOverlay.show("win", ...)` renders the three item cards; `show("lose", ...)`
@@ -164,7 +174,8 @@ Flagged back to the user during ideation rather than guessed at silently:
 - **Pricing**: flat $20 per item (not tiered by perceived power) — 4 punches' worth each.
 - **Multi-purchase**: a single win-dialog visit can buy more than one item, as long as money
   covers each in turn.
-- **Reset**: gated behind a native `confirm()` prompt.
+- **Reset**: gated behind a confirmation prompt — a custom `ConfirmDialog` styled like the win/lose
+  card, not a native browser `confirm()` (the game avoids native dialogs entirely).
 - **Halo hover**: apex-only — zero gravity/pinned velocity only while `Space` is held *at* the
   jump's peak, not for the whole airborne duration. See mental-model point 6.
 - **Coffee**: halves *both* `EXTEND_DURATION_MS` and `RETRACT_DURATION_MS` — the whole punch cycle

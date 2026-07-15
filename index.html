@@ -316,6 +316,39 @@
       #touch-jump-button:active {
         background: rgba(255, 255, 255, 0.3);
       }
+      #owned-items {
+        position: fixed;
+        right: 24px;
+        bottom: 124px;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+      .owned-item {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(79, 195, 247, 0.15);
+        border: 2px solid #4fc3f7;
+        box-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .owned-item.hidden {
+        display: none;
+      }
+      .owned-item svg {
+        width: 20px;
+        height: 20px;
+        stroke: #4fc3f7;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
     </style>
   </head>
   <body>
@@ -340,6 +373,22 @@
       <div id="touch-joystick-knob"></div>
     </div>
     <button id="touch-jump-button" class="touch-control control-hidden">JUMP</button>
+    <div id="owned-items">
+      <div class="owned-item hidden" id="owned-item-long-spring" title="Long Spring">
+        <svg viewBox="0 0 24 24"><path d="M3 6 L7 18 L11 6 L15 18 L19 6 L21 12" /></svg>
+      </div>
+      <div class="owned-item hidden" id="owned-item-coffee" title="Coffee">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 8h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8z" />
+          <path d="M16 10h2a2 2 0 0 1 0 4h-2" />
+          <path d="M8 3c0 1-1 1-1 2" />
+          <path d="M13 3c0 1-1 1-1 2" />
+        </svg>
+      </div>
+      <div class="owned-item hidden" id="owned-item-halo" title="Halo">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="4" /></svg>
+      </div>
+    </div>
     <div id="endgame-overlay" class="hidden">
       <div class="endgame-card" id="endgame-card">
         <div class="endgame-title" id="endgame-title">YOU WIN</div>

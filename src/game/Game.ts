@@ -51,6 +51,11 @@ export class Game {
   private readonly sounds = new SoundEffects();
   private readonly moneyDisplay = document.getElementById("hud-money") as HTMLDivElement;
   private readonly resetButton = document.getElementById("hud-reset") as HTMLButtonElement;
+  private readonly ownedItemIcons: Record<string, HTMLElement> = {
+    "long-spring": document.getElementById("owned-item-long-spring") as HTMLElement,
+    coffee: document.getElementById("owned-item-coffee") as HTMLElement,
+    halo: document.getElementById("owned-item-halo") as HTMLElement,
+  };
 
   private camera!: ArcRotateCamera;
   private arena!: Arena;
@@ -150,6 +155,10 @@ export class Game {
     this.playerGlove.setReachMultiplier(Store.ownsItem("long-spring") ? 2 : 1);
     this.playerGlove.setSpeedMultiplier(Store.ownsItem("coffee") ? 2 : 1);
     this.playerHalo.setEnabled(Store.ownsItem("halo"));
+
+    for (const [id, icon] of Object.entries(this.ownedItemIcons)) {
+      icon.classList.toggle("hidden", !Store.ownsItem(id));
+    }
   }
 
   /** Refreshes the HUD's money readout from the Store — call after any change to money. */
