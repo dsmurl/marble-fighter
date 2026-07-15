@@ -74,6 +74,7 @@
       .endgame-card.win {
         border-color: rgba(255, 214, 92, 0.5);
         box-shadow: 0 0 40px rgba(255, 214, 92, 0.25), 0 20px 60px rgba(0, 0, 0, 0.5);
+        min-width: 420px;
       }
       .endgame-card.win .endgame-title {
         color: #ffd65c;
@@ -116,6 +117,56 @@
       }
       #endgame-restart:active {
         transform: translateY(0);
+      }
+      .endgame-store {
+        display: flex;
+        gap: 12px;
+        margin: 0 0 24px;
+      }
+      .endgame-store.hidden {
+        display: none;
+      }
+      .item-card {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 10px;
+        border-radius: 10px;
+        text-align: left;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        transition: opacity 0.15s ease;
+      }
+      .item-card.owned {
+        opacity: 0.4;
+      }
+      .item-card-name {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .item-card-desc {
+        font-size: 11px;
+        color: #c8c8d0;
+        line-height: 1.3;
+        margin-bottom: 10px;
+        min-height: 28px;
+      }
+      .item-card-buy {
+        width: 100%;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 0;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background: #eaeaea;
+        color: #101014;
+      }
+      .item-card-buy:disabled {
+        cursor: default;
+        opacity: 0.5;
+        background: rgba(255, 255, 255, 0.25);
       }
       #hud-reset {
         position: fixed;
@@ -212,6 +263,7 @@
       <div class="endgame-card" id="endgame-card">
         <div class="endgame-title" id="endgame-title">YOU WIN</div>
         <div class="endgame-subtitle" id="endgame-subtitle"></div>
+        <div class="endgame-store hidden" id="endgame-store"></div>
         <button id="endgame-restart">OK</button>
       </div>
     </div>
