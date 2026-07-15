@@ -21,7 +21,7 @@ import { createCameraRig, updateCameraTarget } from "./CameraRig";
 import { AIController } from "./AIController";
 import { EndGameOverlay } from "./EndGameOverlay";
 import { Glove } from "./Glove";
-import { createCrown, createDunceCap, updateHeadwearPosition } from "./Headwear";
+import { createCrown, createDunceCap, createHalo, updateHeadwearPosition } from "./Headwear";
 import { SoundEffects } from "./SoundEffects";
 import { TouchControls } from "./TouchControls";
 import * as Store from "./Store";
@@ -59,6 +59,7 @@ export class Game {
   private opponentGlove!: Glove;
   private playerCrown!: TransformNode;
   private opponentDunceCap!: TransformNode;
+  private playerHalo!: TransformNode;
 
   private roundOver = false;
 
@@ -124,6 +125,7 @@ export class Game {
 
     this.playerCrown = createCrown(this.scene, "playerCrown", this.player.radius);
     this.opponentDunceCap = createDunceCap(this.scene, "opponentDunceCap", this.opponent.radius);
+    this.playerHalo = createHalo(this.scene, "playerHalo", this.player.radius);
 
     this.updateMoneyDisplay();
     this.applyOwnedItemEffects();
@@ -138,6 +140,7 @@ export class Game {
   private applyOwnedItemEffects(): void {
     this.playerGlove.setReachMultiplier(Store.ownsItem("long-spring") ? 2 : 1);
     this.playerGlove.setSpeedMultiplier(Store.ownsItem("coffee") ? 2 : 1);
+    this.playerHalo.setEnabled(Store.ownsItem("halo"));
   }
 
   /** Refreshes the HUD's money readout from the Store — call after any change to money. */
@@ -240,6 +243,7 @@ export class Game {
   private updateHeadwear(): void {
     updateHeadwearPosition(this.playerCrown, this.player.getPosition(), this.player.radius);
     updateHeadwearPosition(this.opponentDunceCap, this.opponent.getPosition(), this.opponent.radius);
+    updateHeadwearPosition(this.playerHalo, this.player.getPosition(), this.player.radius);
   }
 
   private handlePlayerInput(): void {
