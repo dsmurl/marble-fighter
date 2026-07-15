@@ -37,7 +37,9 @@ _None._
 
 ## Subdirectories
 
-_None._
+| Link | Description |
+| --- | --- |
+| [mechanisms/](mechanisms/README.md) | Per-mechanism design docs — mental model, ideation, and architectural reasoning for well-defined features/system parts. |
 
 ---
 

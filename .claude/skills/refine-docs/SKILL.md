@@ -1,6 +1,6 @@
 ---
 name: refine-docs
-description: Check the docs/ directory against this repo's structure conventions (per-directory README with description + Files/Subdirectories ToC tables, top/bottom back-links on every file, ToCs ordered for clarity, a mandatory baseline set of subdirectories) and fix any drift found. Use when the user asks to "refine docs", "check the docs structure", "run Refine Docs", or similar, in this repo.
+description: Check the docs/ directory against this repo's structure conventions (per-directory README with description + Files/Subdirectories ToC tables, top/bottom back-links on every file, ToCs ordered for clarity, a mandatory baseline set of subdirectories including docs/arch/mechanisms/) and fix any drift found. Use when the user asks to "refine docs", "check the docs structure", "run Refine Docs", or similar, in this repo.
 ---
 
 # Refine Docs
@@ -27,6 +27,12 @@ Every project's `docs/` must contain at least these four subdirectories — they
 A project may have additional top-level directories beyond these four (e.g. a `docs/api/`) — that's fine. What's
 not fine is a project missing one of the four baseline directories once it has content that belongs there.
 
+In addition, `docs/arch/` must always contain a `mechanisms/` subdirectory — see the dedicated
+[Mechanisms](#mechanisms) section below for what belongs there and why. Unlike the other baseline directories,
+`mechanisms/` is mandatory unconditionally (not just "once it has content that belongs there"), because
+`docs/arch/README.md` itself needs to link to it as part of the standing engineering process, even on day one
+before any mechanism has been documented.
+
 ### Philosophy each README's description paragraph should carry
 
 Rule 1 below requires every `README.md` to open with a short description of what the directory covers. For
@@ -41,7 +47,8 @@ make sure the description paragraph communicates:
   and included package decisions, plus an inventory of what things exist (e.g. which environment variables exist
   and what each one is for). It describes the system as it is, not how to configure, acquire, or act on any of it
   — that's `how-to/`'s job. Two docs can cover the same subject: an `arch/` doc says what it is, a `how-to/` doc
-  walks through doing something with it.
+  walks through doing something with it. It must also list `mechanisms/` in its Subdirectories ToC — see
+  [Mechanisms](#mechanisms).
 - **`docs/setup/README.md`**: a "start here" doc set — how to stand the repo up and get it running locally, and
   how to deploy it.
 - **`docs/how-to/README.md`**: **procedural** guides — a developer's helper for walking through how to actually
@@ -54,6 +61,50 @@ make sure the description paragraph communicates:
 
 When scaffolding a missing baseline directory (step 8), write its README's description paragraph to match the
 relevant bullet above rather than a generic placeholder.
+
+## Mechanisms
+
+`docs/arch/mechanisms/` is a mandatory subdirectory of `docs/arch/`, one file per **mechanism**. A mechanism is a
+small, well-defined feature or self-contained part of a system — specific enough to name and scope in one
+sentence: a login mechanism, a school-board mechanism, a database-cleanup mechanism. It's narrower than a whole
+`arch/` subsystem doc and narrower than a `how-to/` guide — it's the unit of design that a single feature or
+system component compiles down to.
+
+**Why this exists:** documenting mechanisms is meant to be a standing part of the engineering cycle, not a
+one-off writing exercise. When someone adds something new to the codebase, the expectation is that they identify
+what mechanism(s) it introduces or touches, and that new mechanisms get compared against existing ones and
+reviewed for compatibility before or alongside implementation — the same way a design review would catch two
+features quietly assuming incompatible things about the same piece of state. `docs/arch/mechanisms/` is where
+that comparison has a fixed place to happen, instead of living only in someone's head or a chat thread.
+
+**Purpose of a mechanism doc — it serves two distinct readers:**
+
+1. **Future AI review, during this feature and later ones.** The doc should lay out the current mental model
+   behind the mechanism plainly enough that an AI reviewing a future change (to this mechanism or to a different
+   one that interacts with it) can check the new work against it without having to reverse-engineer it from code.
+2. **A human walking through the mechanism's ideation.** The doc should also read as a human-facing narrative:
+   what the mechanism is for, what mentality/ideation led to it, and the reasoning behind its architecture from a
+   code/system standpoint — not just what it does, but why it was shaped the way it was.
+
+A mechanism doc is not a spec of current behavior only (that's what the rest of `arch/` and code comments are
+for) — it's specifically the record of intent and design reasoning that doesn't survive reading the code alone.
+
+**Structure:** `docs/arch/mechanisms/` follows the same conventions as any other `docs/` directory (rules 1-3
+above) — it needs its own `README.md` with a Files ToC (one row per mechanism doc) and a description paragraph
+explaining the concept above, and each mechanism file follows the standard back-link and structure rules. Prefer
+one file per mechanism (e.g. `login-mechanism.md`, `db-cleanup-mechanism.md`) over bundling several into one doc,
+so each can be reviewed and linked to independently.
+
+When checking/fixing this repo's docs (step 1 and step 8), treat a missing `docs/arch/mechanisms/` the same as a
+missing baseline directory: scaffold the directory and its `README.md` even if no mechanism docs exist yet.
+
+**This skill does not go looking for mechanisms to document.** Everything else in this skill is about scanning
+`docs/` and reconciling it against what's on disk — but new mechanism docs are not something to infer from
+scanning the codebase for features that look mechanism-shaped. A new mechanism doc gets created only when the
+user initiates it by expressing that they're picturing, ideating, or designing a new mechanism — e.g. "I want to
+make a new mechanism in this code," "let's design a mechanism for X," or similar. Absent that kind of prompt,
+running this skill should only ensure `docs/arch/mechanisms/` exists and is structurally sound (README, ToC,
+back-links) — it should not add, remove, or rewrite individual mechanism files on its own initiative.
 
 ## The conventions being enforced
 
@@ -93,7 +144,8 @@ relevant bullet above rather than a generic placeholder.
 ## Steps
 
 1. **Check the baseline directory set.** Confirm `docs/arch/`, `docs/setup/`, `docs/how-to/`, and `docs/testing/`
-   all exist. Note any that are missing entirely — these get scaffolded in the fix step, not just flagged.
+   all exist, and confirm `docs/arch/mechanisms/` exists (see [Mechanisms](#mechanisms)). Note any that are
+   missing entirely — these get scaffolded in the fix step, not just flagged.
 
 2. **Enumerate the tree.** `find docs -type f -name '*.md'` and `find docs -type d`.
 
@@ -200,3 +252,6 @@ Also sanity-check the two behaviors added for portability:
   (e.g. a deploy guide under `docs/arch/` instead of `docs/how-to/`). Running this skill should flag it in step 7
   and, when fixing, move it to the correct directory with both parent READMEs' ToCs and the file's own back-link
   updated to match.
+- **Missing `docs/arch/mechanisms/`.** Temporarily rename it aside. Running this skill should flag it as missing
+  in step 1 and, when fixing, recreate the directory with a scaffolded `README.md` whose description paragraph
+  explains the mechanisms concept (per the [Mechanisms](#mechanisms) section), not a generic placeholder.
