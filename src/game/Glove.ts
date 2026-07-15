@@ -33,6 +33,9 @@ export class Glove {
   private readonly spring: Mesh;
   private readonly gloveRoot: TransformNode;
 
+  private reachMultiplier = 1;
+  private speedMultiplier = 1;
+
   private state: PunchState = "idle";
   private elapsedMs = 0;
   private direction = new Vector3(0, 0, 1);
@@ -51,6 +54,16 @@ export class Glove {
   /** A new punch can start as soon as the previous one has fully retracted. */
   canPunch(): boolean {
     return this.state === "idle";
+  }
+
+  /** Scales the punch's travel distance on top of the base `reach` — the spring mesh stretches to match. Default 1. */
+  setReachMultiplier(multiplier: number): void {
+    this.reachMultiplier = multiplier;
+  }
+
+  /** Scales both extend and retract phases down (duration = base / multiplier) — the whole punch cycle runs faster. Default 1. */
+  setSpeedMultiplier(multiplier: number): void {
+    this.speedMultiplier = multiplier;
   }
 
   punch(direction: Vector3): void {
@@ -79,18 +92,19 @@ export class Glove {
     if (this.state === "idle") return;
 
     this.elapsedMs += deltaMs;
+    const effectiveReach = this.reach * this.reachMultiplier;
     let currentLength: number;
 
     if (this.state === "extending") {
-      const t = Math.min(this.elapsedMs / EXTEND_DURATION_MS, 1);
-      currentLength = this.reach * easeOut(t);
+      const t = Math.min(this.elapsedMs / (EXTEND_DURATION_MS / this.speedMultiplier), 1);
+      currentLength = effectiveReach * easeOut(t);
       if (t >= 1) {
         this.state = "retracting";
         this.elapsedMs = 0;
       }
     } else {
-      const t = Math.min(this.elapsedMs / RETRACT_DURATION_MS, 1);
-      currentLength = this.reach * (1 - easeIn(t));
+      const t = Math.min(this.elapsedMs / (RETRACT_DURATION_MS / this.speedMultiplier), 1);
+      currentLength = effectiveReach * (1 - easeIn(t));
       if (t >= 1) {
         this.state = "idle";
         this.setVisible(false);

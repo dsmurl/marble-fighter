@@ -1,4 +1,4 @@
-import { Scene, TransformNode, MeshBuilder, StandardMaterial, Color3, Vector3 } from "@babylonjs/core";
+import { Scene, TransformNode, MeshBuilder, StandardMaterial, Color3, Vector3, Mesh } from "@babylonjs/core";
 
 /**
  * Purely cosmetic — a hat sitting on top of a marble. Kept unparented from
@@ -80,6 +80,29 @@ export function createDunceCap(scene: Scene, name: string, ballRadius: number): 
   cone.position.y = brimHeight + coneHeight / 2;
   cone.material = capMat;
   cone.parent = root;
+
+  return root;
+}
+
+/** The Halo item's cosmetic — floats above the ball, a bit higher than the crown/dunce cap sit. */
+export function createHalo(scene: Scene, name: string, ballRadius: number): TransformNode {
+  const root = new TransformNode(`${name}Root`, scene);
+
+  const haloMat = new StandardMaterial(`${name}Mat`, scene);
+  haloMat.diffuseColor = Color3.FromHexString("#fff2b0");
+  haloMat.emissiveColor = Color3.FromHexString("#ffe98a");
+  haloMat.specularColor = new Color3(1, 1, 0.9);
+
+  // CreateTorus's ring already lies flat in the XZ plane (its axis runs along
+  // Y) — no rotation needed to keep it parallel to the ground, angel-halo style.
+  const ring: Mesh = MeshBuilder.CreateTorus(
+    `${name}Ring`,
+    { diameter: ballRadius * 1.6, thickness: ballRadius * 0.14, tessellation: 24 },
+    scene,
+  );
+  ring.position.y = ballRadius * 0.9;
+  ring.material = haloMat;
+  ring.parent = root;
 
   return root;
 }

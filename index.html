@@ -33,6 +33,13 @@
         pointer-events: none;
         user-select: none;
       }
+      #hud-money {
+        font-size: 22px;
+        font-weight: 800;
+        color: #4caf50;
+        text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        margin: 2px 0 4px;
+      }
       #endgame-overlay {
         position: fixed;
         inset: 0;
@@ -74,6 +81,7 @@
       .endgame-card.win {
         border-color: rgba(255, 214, 92, 0.5);
         box-shadow: 0 0 40px rgba(255, 214, 92, 0.25), 0 20px 60px rgba(0, 0, 0, 0.5);
+        min-width: 420px;
       }
       .endgame-card.win .endgame-title {
         color: #ffd65c;
@@ -116,6 +124,149 @@
       }
       #endgame-restart:active {
         transform: translateY(0);
+      }
+      .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(4, 4, 8, 0.72);
+        backdrop-filter: blur(6px);
+        opacity: 1;
+        transition: opacity 0.2s ease;
+        z-index: 11;
+      }
+      .confirm-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .confirm-card {
+        min-width: 280px;
+        padding: 32px 40px;
+        border-radius: 16px;
+        text-align: center;
+        font-family: system-ui, sans-serif;
+        color: #f4f4f4;
+        background: linear-gradient(160deg, rgba(24, 24, 32, 0.95), rgba(10, 10, 16, 0.95));
+        border: 1px solid rgba(255, 90, 90, 0.5);
+        box-shadow: 0 0 40px rgba(255, 90, 90, 0.25), 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: endgame-pop 0.25s ease;
+      }
+      .confirm-title {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        margin-bottom: 8px;
+        color: #ff9a9a;
+        text-shadow: 0 0 20px rgba(255, 90, 90, 0.6);
+      }
+      .confirm-subtitle {
+        font-size: 14px;
+        color: #c8c8d0;
+        margin-bottom: 24px;
+      }
+      .confirm-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+      }
+      .confirm-btn {
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 28px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.1s ease, background 0.15s ease;
+      }
+      .confirm-btn:active {
+        transform: translateY(0);
+      }
+      .confirm-btn-cancel {
+        background: rgba(255, 255, 255, 0.12);
+        color: #eaeaea;
+      }
+      .confirm-btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.22);
+      }
+      .confirm-btn-danger {
+        background: #ff6f6f;
+        color: #101014;
+      }
+      .confirm-btn-danger:hover {
+        background: #ff8a8a;
+        transform: translateY(-1px);
+      }
+      .endgame-store {
+        display: flex;
+        gap: 12px;
+        margin: 0 0 24px;
+      }
+      .endgame-store.hidden {
+        display: none;
+      }
+      .item-card {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 10px;
+        border-radius: 10px;
+        text-align: left;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        transition: opacity 0.15s ease;
+      }
+      .item-card.owned {
+        opacity: 0.4;
+      }
+      .item-card-name {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .item-card-desc {
+        font-size: 11px;
+        color: #c8c8d0;
+        line-height: 1.3;
+        margin-bottom: 10px;
+        min-height: 28px;
+      }
+      .item-card-buy {
+        width: 100%;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 0;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background: #eaeaea;
+        color: #101014;
+      }
+      .item-card-buy:disabled {
+        cursor: default;
+        opacity: 0.5;
+        background: rgba(255, 255, 255, 0.25);
+      }
+      #hud-reset {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        z-index: 5;
+        font-family: system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.12);
+        color: #eaeaea;
+        transition: background 0.15s ease;
+      }
+      #hud-reset:hover {
+        background: rgba(255, 255, 255, 0.22);
       }
       .control-hidden {
         display: none;
@@ -165,12 +316,47 @@
       #touch-jump-button:active {
         background: rgba(255, 255, 255, 0.3);
       }
+      #owned-items {
+        position: fixed;
+        right: 24px;
+        bottom: 124px;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+      .owned-item {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(79, 195, 247, 0.15);
+        border: 2px solid #4fc3f7;
+        box-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .owned-item.hidden {
+        display: none;
+      }
+      .owned-item svg {
+        width: 20px;
+        height: 20px;
+        stroke: #4fc3f7;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
     </style>
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
+    <button id="hud-reset">RESET</button>
     <div id="hud">
       <div><strong>Marble Fighter</strong></div>
+      <div id="hud-money">$0</div>
       <div id="hud-controls-desktop">
         <div>WASD / Arrows — roll</div>
         <div>Space — jump</div>
@@ -187,11 +373,38 @@
       <div id="touch-joystick-knob"></div>
     </div>
     <button id="touch-jump-button" class="touch-control control-hidden">JUMP</button>
+    <div id="owned-items">
+      <div class="owned-item hidden" id="owned-item-long-spring" title="Long Spring">
+        <svg viewBox="0 0 24 24"><path d="M3 6 L7 18 L11 6 L15 18 L19 6 L21 12" /></svg>
+      </div>
+      <div class="owned-item hidden" id="owned-item-coffee" title="Coffee">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 8h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8z" />
+          <path d="M16 10h2a2 2 0 0 1 0 4h-2" />
+          <path d="M8 3c0 1-1 1-1 2" />
+          <path d="M13 3c0 1-1 1-1 2" />
+        </svg>
+      </div>
+      <div class="owned-item hidden" id="owned-item-halo" title="Halo">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="4" /></svg>
+      </div>
+    </div>
     <div id="endgame-overlay" class="hidden">
       <div class="endgame-card" id="endgame-card">
         <div class="endgame-title" id="endgame-title">YOU WIN</div>
         <div class="endgame-subtitle" id="endgame-subtitle"></div>
+        <div class="endgame-store hidden" id="endgame-store"></div>
         <button id="endgame-restart">OK</button>
+      </div>
+    </div>
+    <div id="confirm-overlay" class="confirm-overlay hidden">
+      <div class="confirm-card">
+        <div class="confirm-title">Reset Progress?</div>
+        <div class="confirm-subtitle" id="confirm-subtitle"></div>
+        <div class="confirm-actions">
+          <button id="confirm-cancel" class="confirm-btn confirm-btn-cancel">Cancel</button>
+          <button id="confirm-ok" class="confirm-btn confirm-btn-danger">Reset</button>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>

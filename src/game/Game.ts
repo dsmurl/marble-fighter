@@ -20,10 +20,12 @@ import { InputManager } from "./InputManager";
 import { createCameraRig, updateCameraTarget } from "./CameraRig";
 import { AIController } from "./AIController";
 import { EndGameOverlay } from "./EndGameOverlay";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { Glove } from "./Glove";
-import { createCrown, createDunceCap, updateHeadwearPosition } from "./Headwear";
+import { createCrown, createDunceCap, createHalo, updateHeadwearPosition } from "./Headwear";
 import { SoundEffects } from "./SoundEffects";
 import { TouchControls } from "./TouchControls";
+import * as Store from "./Store";
 
 const ROLL_FORCE = 9;
 // Calibrated so the apex lands ~1.75x the ball's diameter above the ground
@@ -41,8 +43,19 @@ export class Game {
   private readonly canvas: HTMLCanvasElement;
   private readonly input = new InputManager();
   private readonly touchControls = new TouchControls(this.input);
-  private readonly endGameOverlay = new EndGameOverlay(() => this.resetRound());
+  private readonly endGameOverlay = new EndGameOverlay(
+    () => this.resetRound(),
+    () => this.onItemPurchased(),
+  );
+  private readonly confirmDialog = new ConfirmDialog();
   private readonly sounds = new SoundEffects();
+  private readonly moneyDisplay = document.getElementById("hud-money") as HTMLDivElement;
+  private readonly resetButton = document.getElementById("hud-reset") as HTMLButtonElement;
+  private readonly ownedItemIcons: Record<string, HTMLElement> = {
+    "long-spring": document.getElementById("owned-item-long-spring") as HTMLElement,
+    coffee: document.getElementById("owned-item-coffee") as HTMLElement,
+    halo: document.getElementById("owned-item-halo") as HTMLElement,
+  };
 
   private camera!: ArcRotateCamera;
   private arena!: Arena;
@@ -53,8 +66,11 @@ export class Game {
   private opponentGlove!: Glove;
   private playerCrown!: TransformNode;
   private opponentDunceCap!: TransformNode;
+  private playerHalo!: TransformNode;
 
   private roundOver = false;
+  private haloHoverActive = false;
+  private playerPrevVerticalVelocity = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -67,8 +83,23 @@ export class Game {
     await this.initPhysics();
     this.buildScene();
     this.registerPunchInput();
+    this.registerResetButton();
     this.registerLoop();
     window.addEventListener("resize", () => this.engine.resize());
+  }
+
+  private registerResetButton(): void {
+    this.resetButton.addEventListener("click", async () => {
+      const confirmed = await this.confirmDialog.show("Reset your money and items?");
+      if (!confirmed) return;
+      Store.reset();
+      // Store.reset() only clears localStorage — the player's already-built
+      // glove/halo still carry whatever multipliers/visibility a purchase
+      // set, so they need to be explicitly re-synced back to "nothing owned".
+      this.applyOwnedItemEffects();
+      this.updateMoneyDisplay();
+      this.resetRound();
+    });
   }
 
   private async initPhysics(): Promise<void> {
@@ -108,6 +139,37 @@ export class Game {
 
     this.playerCrown = createCrown(this.scene, "playerCrown", this.player.radius);
     this.opponentDunceCap = createDunceCap(this.scene, "opponentDunceCap", this.opponent.radius);
+    this.playerHalo = createHalo(this.scene, "playerHalo", this.player.radius);
+
+    this.updateMoneyDisplay();
+    this.applyOwnedItemEffects();
+  }
+
+  /**
+   * Re-applies every owned item's effect to the player's already-built
+   * glove/marble — called once on scene build and again after every
+   * purchase, since the glove is never rebuilt by resetRound. Never touches
+   * opponentGlove/opponent.
+   */
+  private applyOwnedItemEffects(): void {
+    this.playerGlove.setReachMultiplier(Store.ownsItem("long-spring") ? 2 : 1);
+    this.playerGlove.setSpeedMultiplier(Store.ownsItem("coffee") ? 2 : 1);
+    this.playerHalo.setEnabled(Store.ownsItem("halo"));
+
+    for (const [id, icon] of Object.entries(this.ownedItemIcons)) {
+      icon.classList.toggle("hidden", !Store.ownsItem(id));
+    }
+  }
+
+  /** Refreshes the HUD's money readout from the Store — call after any change to money. */
+  private updateMoneyDisplay(): void {
+    this.moneyDisplay.textContent = `$${Store.getState().money}`;
+  }
+
+  /** Fired by EndGameOverlay after every successful win-dialog purchase. */
+  private onItemPurchased(): void {
+    this.updateMoneyDisplay();
+    this.applyOwnedItemEffects();
   }
 
   /** Left-click throws a punch toward wherever the pointer is on the arena plane. */
@@ -152,6 +214,7 @@ export class Game {
       this.updateHeadwear();
       if (!this.roundOver) {
         this.handlePlayerInput();
+        this.updateHaloHover();
         this.opponentAI.update(this.player.getPosition());
         this.checkRingOut();
         updateCameraTarget(this.camera, this.player.getPosition());
@@ -163,6 +226,8 @@ export class Game {
         this.playerGlove.update(deltaMs, this.player.getPosition(), this.opponent, (direction) => {
           this.opponent.applyPunchImpulse(direction, PUNCH_IMPULSE);
           this.sounds.playHit();
+          Store.addMoney(5);
+          this.updateMoneyDisplay();
         });
         this.opponentGlove.update(deltaMs, this.opponent.getPosition(), this.player, (direction) => {
           this.player.applyPunchImpulse(direction, PUNCH_IMPULSE);
@@ -197,6 +262,7 @@ export class Game {
   private updateHeadwear(): void {
     updateHeadwearPosition(this.playerCrown, this.player.getPosition(), this.player.radius);
     updateHeadwearPosition(this.opponentDunceCap, this.opponent.getPosition(), this.opponent.radius);
+    updateHeadwearPosition(this.playerHalo, this.player.getPosition(), this.player.radius);
   }
 
   private handlePlayerInput(): void {
@@ -230,6 +296,35 @@ export class Game {
     }
   }
 
+  /**
+   * Halo item: hang motionless in midair for as long as Space stays held,
+   * but only if Space was already held at the exact instant the player's
+   * jump crosses its apex (vy > 0 -> vy <= 0) while airborne. Holding Space
+   * anywhere else in the arc — ascending, or well past the apex — does
+   * nothing, so this stays a hang, not general flight.
+   */
+  private updateHaloHover(): void {
+    const currentVy = this.player.getVerticalVelocity();
+    const airborne = !this.player.isGrounded();
+    const spaceHeld = this.input.isDown("Space");
+
+    if (!this.haloHoverActive) {
+      const crossedApex = this.playerPrevVerticalVelocity > 0 && currentVy <= 0;
+      if (crossedApex && airborne && spaceHeld && Store.ownsItem("halo")) {
+        this.haloHoverActive = true;
+        this.player.setGravityFactor(0);
+        this.player.setVerticalVelocity(0);
+      }
+    } else if (!spaceHeld) {
+      this.haloHoverActive = false;
+      this.player.setGravityFactor(1);
+    } else {
+      this.player.setVerticalVelocity(0);
+    }
+
+    this.playerPrevVerticalVelocity = currentVy;
+  }
+
   private checkRingOut(): void {
     const fellOff = (marble: Marble) => marble.getPosition().y < -6;
 
@@ -252,5 +347,7 @@ export class Game {
     this.player.reset(PLAYER_START_POSITION.clone());
     this.opponent.reset(OPPONENT_START_POSITION.clone());
     this.roundOver = false;
+    this.haloHoverActive = false;
+    this.playerPrevVerticalVelocity = 0;
   }
 }
