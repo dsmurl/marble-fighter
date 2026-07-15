@@ -100,7 +100,12 @@ or any of the three items should be checked against these points.
    build and again after every purchase (via `EndGameOverlay`'s `onPurchase` callback). Never an
    `if (ownsLongSpring)` branch scattered through `Glove.update` — this still mirrors how
    `control-mechanism.md` treats new movement-adjacent features, just via setters instead of
-   constructor args.
+   constructor args. The spring's coil mesh is never rebuilt at a larger size for Long Spring — its
+   geometry is still built once at the base (un-multiplied) `reach`, and `scaling.z` stretches it to
+   match the multiplied `currentLength` each frame (unchanged from how it already animated the
+   extend/retract swing). A multiplier much larger than 2 would visibly thin/distort the coil rather
+   than add more coils, which is fine at the one shipped value but worth knowing before pushing it
+   higher.
 
 6. **Halo's hover only triggers at the jump's apex, not for the whole time airborne — it's a hang,
    not a flight.** The apex is the instant the marble's vertical velocity crosses from rising
