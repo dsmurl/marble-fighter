@@ -3,6 +3,8 @@
 A minimal, all-code 3D marble battle prototype: TypeScript + Vite + Babylon.js + Havok physics.
 No editor, no IDE lock-in — everything is plain `.ts` files you (or an AI) can edit directly.
 
+**[Try the live demo](https://marble-fighter.vercel.app/)** — no install, runs in the browser.
+
 ## Setup
 
 ```bash
